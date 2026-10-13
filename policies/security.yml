@@ -1,0 +1,37 @@
+version: 1
+policies:
+  - id: users_no_ssh_to_management
+    description: User workstations must not open SSH sessions to the management segment.
+    start_location: edge
+    source: 10.10.10.0/24
+    destination: 10.20.20.10/32
+    protocol: tcp
+    destination_ports: [22]
+    expected: denied
+
+  - id: users_can_reach_internal_https
+    description: User workstations must reach the internal application over HTTPS.
+    start_location: edge
+    source: 10.10.10.0/24
+    destination: 10.30.30.10/32
+    protocol: tcp
+    destination_ports: [443]
+    expected: allowed
+
+  - id: dmz_cannot_reach_management
+    description: DMZ workloads must not reach any management host over SSH.
+    start_location: dmz
+    source: 10.40.40.0/24
+    destination: 10.20.20.10/32
+    protocol: tcp
+    destination_ports: [22]
+    expected: denied
+
+  - id: dmz_can_reach_internal_api
+    description: DMZ workloads may call the internal application only on its API port.
+    start_location: dmz
+    source: 10.40.40.0/24
+    destination: 10.30.30.10/32
+    protocol: tcp
+    destination_ports: [8443]
+    expected: allowed

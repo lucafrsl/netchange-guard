@@ -1,0 +1,42 @@
+name: batfish-integration
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - run: docker compose up -d batfish
+      - name: Wait for Batfish
+        shell: bash
+        run: |
+          for attempt in {1..36}; do
+            if curl --fail --silent http://localhost:9996/v2/network >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker compose logs batfish
+          exit 1
+      - run: netchange-guard demo --policies policies/security.yml --report-dir reports
+      - if: always()
+        run: docker compose logs batfish
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: netchange-guard-reports
+          path: reports/

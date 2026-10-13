@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-10-13T07:34:42.543459+00:00",
+  "passed": true,
+  "policies": [
+    {
+      "description": "User workstations must not open SSH sessions to the management segment.",
+      "evidence": {
+        "evidence_count": 0,
+        "reachable": false,
+        "sample": null
+      },
+      "expected": "denied",
+      "id": "users_no_ssh_to_management",
+      "observed": "denied",
+      "passed": true
+    },
+    {
+      "description": "User workstations must reach the internal application over HTTPS.",
+      "evidence": {
+        "evidence_count": 1,
+        "reachable": true,
+        "sample": "start=edge [10.10.10.0:49152->10.30.30.10:443 TCP (SYN)]"
+      },
+      "expected": "allowed",
+      "id": "users_can_reach_internal_https",
+      "observed": "allowed",
+      "passed": true
+    },
+    {
+      "description": "DMZ workloads must not reach any management host over SSH.",
+      "evidence": {
+        "evidence_count": 0,
+        "reachable": false,
+        "sample": null
+      },
+      "expected": "denied",
+      "id": "dmz_cannot_reach_management",
+      "observed": "denied",
+      "passed": true
+    },
+    {
+      "description": "DMZ workloads may call the internal application only on its API port.",
+      "evidence": {
+        "evidence_count": 1,
+        "reachable": true,
+        "sample": "start=dmz [10.40.40.0:49152->10.30.30.10:8443 TCP (SYN)]"
+      },
+      "expected": "allowed",
+      "id": "dmz_can_reach_internal_api",
+      "observed": "allowed",
+      "passed": true
+    }
+  ],
+  "snapshot": "baseline",
+  "summary": {
+    "passed": 4,
+    "total": 4
+  }
+}
